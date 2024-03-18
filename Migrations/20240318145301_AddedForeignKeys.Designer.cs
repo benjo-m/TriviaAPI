@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TriviaAPI.Data;
 
@@ -10,9 +11,11 @@ using TriviaAPI.Data;
 namespace TriviaAPI.Migrations
 {
     [DbContext(typeof(TriviaContext))]
-    partial class TriviaContextModelSnapshot : ModelSnapshot
+    [Migration("20240318145301_AddedForeignKeys")]
+    partial class AddedForeignKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +58,13 @@ namespace TriviaAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("QuestionId")
+                        .IsUnique();
 
                     b.ToTable("Categories");
                 });
@@ -72,7 +81,13 @@ namespace TriviaAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("QuestionId")
+                        .IsUnique();
 
                     b.ToTable("Difficulties");
                 });
@@ -85,25 +100,15 @@ namespace TriviaAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CorrectAnswer")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DifficultyId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("DifficultyId");
 
                     b.ToTable("Questions");
                 });
@@ -119,38 +124,37 @@ namespace TriviaAPI.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("TriviaAPI.Models.Question", b =>
-                {
-                    b.HasOne("TriviaAPI.Models.Category", "Category")
-                        .WithMany("Questions")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TriviaAPI.Models.Difficulty", "Difficulty")
-                        .WithMany("Questions")
-                        .HasForeignKey("DifficultyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Difficulty");
-                });
-
             modelBuilder.Entity("TriviaAPI.Models.Category", b =>
                 {
-                    b.Navigation("Questions");
+                    b.HasOne("TriviaAPI.Models.Question", "Question")
+                        .WithOne("Category")
+                        .HasForeignKey("TriviaAPI.Models.Category", "QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("TriviaAPI.Models.Difficulty", b =>
                 {
-                    b.Navigation("Questions");
+                    b.HasOne("TriviaAPI.Models.Question", "Question")
+                        .WithOne("Difficulty")
+                        .HasForeignKey("TriviaAPI.Models.Difficulty", "QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("TriviaAPI.Models.Question", b =>
                 {
                     b.Navigation("Answers");
+
+                    b.Navigation("Category")
+                        .IsRequired();
+
+                    b.Navigation("Difficulty")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
