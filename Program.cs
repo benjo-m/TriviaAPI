@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TriviaAPI.Data;
+using TriviaAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<TriviaContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DBConnectionString"))
 );
+builder.Services.AddTransient<ITriviaService, TriviaService>();
 
 var app = builder.Build();
 

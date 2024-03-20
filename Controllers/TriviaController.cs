@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TriviaAPI.Data;
-using TriviaAPI.Models;
 using TriviaAPI.Response;
+using TriviaAPI.Services;
 
 namespace TriviaAPI.Controllers;
 
@@ -10,55 +8,31 @@ namespace TriviaAPI.Controllers;
 [ApiController]
 public class TriviaController : ControllerBase
 {
-    private TriviaContext _context;
+    private ITriviaService _triviaService;
 
-    public TriviaController(TriviaContext context)
+    public TriviaController(ITriviaService service)
     {
-        _context = context;
+        _triviaService = service;
     }
 
     [HttpGet]
     [Route("category")]
     public List<CategoryResponse> GetCategories()
     {
-        var categoryModelList = _context.Categories.ToList();
-        var categories = new List<CategoryResponse>();
-
-        foreach (var item in categoryModelList)
-        {
-            categories.Add(new CategoryResponse(item));
-        }
-
-        return categories;
+        return _triviaService.GetCategories();
     }
 
     [HttpGet]
     [Route("difficulty")]
     public List<DifficultyResponse> GetDifficulties() 
     {
-        var difficultyModelList = _context.Difficulties.ToList();
-        var difficulties = new List<DifficultyResponse>();
-
-        foreach (var item in difficultyModelList)
-        {
-            difficulties.Add(new DifficultyResponse(item));
-        }
-
-        return difficulties;
+        return _triviaService.GetDifficulties();
     }
 
     [HttpGet]
     [Route("question")]
     public List<QuestionResponse> GetQuestions()
     {
-        var questionModelList = _context.Questions.Include(x => x.Category).Include(x => x.Difficulty).Include(x => x.Answers).ToList();
-        var questions = new List<QuestionResponse>();
-
-        foreach(var item in questionModelList)
-        {
-            questions.Add(new QuestionResponse(item));
-        }
-
-        return questions;
+        return _triviaService.GetQuestions();
     }
 }
