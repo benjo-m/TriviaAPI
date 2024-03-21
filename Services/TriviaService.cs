@@ -39,12 +39,27 @@ public class TriviaService : ITriviaService
         return difficulties;
     }
 
-    public List<QuestionResponse> GetQuestions()
+    public List<QuestionResponse> GetQuestions(string? category, string? difficulty)
     {
-        var questionModelList = _context.Questions.Include(x => x.Category).Include(x => x.Difficulty).Include(x => x.Answers).ToList();
+        var query = _context.Questions
+            .Include(x => x.Category)
+            .Include(x => x.Difficulty)
+            .Include(x => x.Answers)
+            .AsQueryable();
+
         var questions = new List<QuestionResponse>();
 
-        foreach (var item in questionModelList)
+        if (category != null)
+        {
+            query = query.Where(x => x.Category.Name == category);
+        }
+
+        if (difficulty != null)
+        {
+            query = query.Where(x => x.Difficulty.Level == difficulty);
+        }
+
+        foreach (var item in query.ToList())
         {
             questions.Add(new QuestionResponse(item));
         }

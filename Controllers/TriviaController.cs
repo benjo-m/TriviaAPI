@@ -31,8 +31,8 @@ public class TriviaController : ControllerBase
 
     [HttpGet]
     [Route("question")]
-    public List<QuestionResponse> GetQuestions()
+    public List<QuestionResponse> GetQuestions(string? category, string? difficulty)
     {
-        return _triviaService.GetQuestions();
+        return _triviaService.GetQuestions(category, difficulty);
     }
 }
